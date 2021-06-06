@@ -2,8 +2,20 @@
 session_start();
 include_once "../config.php";
 // include_once "../config/cekUser.php";
-$loketId = $_SESSION['UID'];
-$QgetNumberAntrian = mysqli_query($konek, "SELECT * FROM antrian WHERE loket_id = '$loketId' AND is_done = 0 ORDER BY created_at ASC LIMIT 1");
+if (!isset($_SESSION['UID'])) {
+    header('location:../index.php');
+}
+
+
+$uid = $_SESSION['UID'];
+$UserData = mysqli_query($konek, "SELECT * FROM users WHERE id = $uid");
+$getUserData = mysqli_fetch_assoc($UserData);
+$loketid = $getUserData['loket_id'];
+$LoketData = mysqli_query($konek, "SELECT * FROM `lokets` WHERE `id` = $loketid");
+
+$getData = mysqli_fetch_assoc($LoketData);
+$toLoket = $getData['aliases'];
+$QgetNumberAntrian = mysqli_query($konek, "SELECT * FROM antrian WHERE loket_id = '$toLoket' AND is_done = 0 ORDER BY created_at ASC LIMIT 1");
 if (mysqli_num_rows($QgetNumberAntrian) > 0) {
     $getNumberAntrian = mysqli_fetch_assoc($QgetNumberAntrian);
 }
@@ -24,7 +36,16 @@ if (mysqli_num_rows($QgetNumberAntrian) > 0) {
 </head>
 
 <body>
-    <a href="../logout.php">keluar</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+                <a href="../logout.php" class="btn btn-outline-danger">keluar</a>
+            </div>
+        </div>
+    </nav>
     <div class="container mb-5 mt-5">
         <div class="card card-body">
             <div class="d-flex flex-column align-center text-center">
@@ -36,6 +57,14 @@ if (mysqli_num_rows($QgetNumberAntrian) > 0) {
                         echo "-";
                     }  ?>
                 </strong>
+                <?php if (isset($getNumberAntrian)) {
+                ?>
+                    <form action="sendAudio.php" id="formSendAudio" method="POST">
+                        <input type="text" name="nomor_antrian" id="inputNomorAntrian" hidden value="<?= $getNumberAntrian["nomor"] ?>">
+                        <button class="btn btn-primary" type="submit">Panggil</button>
+                    </form>
+                <?php
+                } ?>
             </div>
         </div>
     </div>
@@ -45,7 +74,7 @@ if (mysqli_num_rows($QgetNumberAntrian) > 0) {
             <div class="form-group">
                 <div class="d-grid">
                     <input type="hidden" name="get" value="get" id="">
-                    <button class="btn btn-block btn-primary" type="submit">nomor selanjutnya</button>
+                    <button class="btn btn-block btn-info" type="submit">nomor selanjutnya</button>
                 </div>
             </div>
         </form>
@@ -69,7 +98,19 @@ if (mysqli_num_rows($QgetNumberAntrian) > 0) {
                 success: function(data) {
                     if (data.hasil === true) {
                         toastr.success(data.msg);
+                        $.ajax({
+                            url: 'sendAudio.php',
+                            type: 'post',
+                            data: {
+                                nomor_antrian: data.number
+                            },
+                            dataType: 'json',
+                            success: function(data) {}
+                        });
+                        $('#nomorAntrian').removeAttr('hidden');
+                        $('#inputNomorAntrian').val(data.number);
                         $('#nomorAntrian').text(data.number);
+                        $('#nomorAntrian').attr('hidden');
                     } else
                     if (data.hasil === false) {
                         toastr.error(data.msg);

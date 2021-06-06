@@ -5,7 +5,7 @@ if (!$_SESSION['role']) {
 
 
 $roleUser = $_SESSION['role'];
-echo $roleUser;
+
 // die;
 switch ($roleUser) {
     case "admin":

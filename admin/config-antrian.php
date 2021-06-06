@@ -23,8 +23,11 @@ if (mysqli_num_rows($_getConfigAntrian) > 0) {
 </head>
 
 <body>
-    <main>
-        <div class="container-fluid">
+    <?php
+    include_once 'compent-sidebar.php';
+    ?>
+    <main class="mt-4">
+        <div class="container">
             <div class="card">
                 <div class="table-responsive">
                     <table class="table">
@@ -39,13 +42,13 @@ if (mysqli_num_rows($_getConfigAntrian) > 0) {
                     </table>
                 </div>
                 <div class="card-body">
-                    <form method="post">
+                    <form method="post" action="../config/resetQueue.php">
                         <div class="form-group">
                             <label for="">Reset Antrian Menjadi</label>
-                            <input type="number" min="0" name="antrian_ke" value="1" class="form-control" required>
+                            <input type="number" min="0" name="antrian_ke" value="0" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-danger" type="submit">reset</button>
+                            <button class="btn btn-danger" name="resetQueue" type="submit">reset</button>
                         </div>
                     </form>
                 </div>
