@@ -58,11 +58,25 @@ include_once "config.php";
                     <marquee behavior="scroll" direction="left">SMK NEGERI 1 CIKARANG UTARA</marquee>
                 </div>
             </div>
+            <div class="row mt-2">
+                <div class="col-lg-6" id="img_slde">
+                    <div id="carouselExampleFade" class="carousel slide carousel-fade" data-bs-ride="carousel">
+                        <div class="carousel-inner img_slde_inner">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 videoMonitor">
+                    <!-- <video src="assets/videos/video.mp4" class="rounded" width="100%" autoplay muted controls>
+                    </video> -->
+                </div>
+            </div>
             <div class="row mt-5">
-                <div class="col-lg-9 col-md-9 row listlokets">
+                <!-- <div class="col-lg-9 col-md-9 row listlokets">
                 </div>
                 <div class="col-lg-3 col-md-3">
 
+                </div> -->
+                <div class="col-lg-12 col-md-12 row listlokets">
                 </div>
             </div>
         </div>
@@ -74,6 +88,8 @@ include_once "config.php";
     <script>
         $("document").ready(function() {
             var tmp_loket = 0;
+            var tmp_img = 0;
+            var tmp_video = "";
             setInterval(function() {
                 $.ajax({
                     url: 'panggil.php',
@@ -96,6 +112,60 @@ include_once "config.php";
                     }
                 });
                 $.ajax({
+                    url: 'getVideo.php',
+                    type: 'post',
+                    data: {
+                        getVideo: true
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        if (tmp_video != data['video_src']) {
+                            $('.videoMonitor').html("");
+                            tmp_video = "";
+                        }
+                        if (tmp_video == "") {
+                            videoShow = '';
+                            // if (data["jml_video"] == 1) {
+                            videoShow += ' <video  class="rounded" width="100%" muted autoplay loop>' +
+                                '<source src="' + data["video_src"] + '" />' +
+                                '</video>'
+                            // }
+                            $('.videoMonitor').html(videoShow);
+                            tmp_video = data["video_src"];
+                        }
+                    }
+                });
+                $.ajax({
+                    url: 'getImagesSlide.php',
+                    type: 'post',
+                    data: {
+                        getImagesSlide: true
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        if (tmp_img != data['jml_img']) {
+                            $('.img_slde_inner').html("");
+                            tmp_img = 0;
+                        }
+                        if (tmp_img == 0) {
+                            imageslide = '';
+                            for (var i = 1; i <= data["jml_img"]; i++) {
+                                if (i == 1) {
+                                    imageslide += '<div class="carousel-item active">' +
+                                        '<img src="' + data["img_src"][i] + '" class="d-block w-100" alt="...">' +
+                                        '</div>';
+                                } else {
+                                    imageslide += '<div class="carousel-item">' +
+                                        '<img src="' + data["img_src"][i] + '" class="d-block w-100" alt="...">' +
+                                        '</div>';
+                                }
+                            }
+                            $('.img_slde_inner').html(imageslide);
+                            tmp_img = data["jml_img"];
+                        }
+                    }
+                });
+                $.ajax({
                     url: 'getLokets.php',
                     type: 'post',
                     data: {
@@ -110,9 +180,9 @@ include_once "config.php";
 
                         if (tmp_loket == 0) {
                             for (var i = 1; i <= data['jml_loket']; i++) {
-                                loket = '<div class="col-lg-4 mb-2">' +
+                                loket = '<div class="col-lg-3 mb-2">' +
                                     '<div class="card">' +
-                                    '<div class="card-body text-center justify-content-center align-items-center d-flex" style="min-height: 200px;">' +
+                                    '<div class="card-body text-center justify-content-center align-items-center d-flex" style="min-height: 100px;">' +
                                     '<span class="h1 urut' + i + '">' +
                                     data['urut'][i] +
                                     '</span>' +
