@@ -29,7 +29,7 @@ if (isset($_SESSION['role'])) {
     <form action="login.php" method="POST">
         <input type="hidden" name="_token" value="<?php echo $token ?>" id="">
         <input type="text" name="username" id="" placeholder="username">
-        <input type="text" name="password" id="" placeholder="password">
+        <input type="password" name="password" id="" placeholder="password">
         <button type="submit" name="login-submit">login</button>
     </form>
 </body>
